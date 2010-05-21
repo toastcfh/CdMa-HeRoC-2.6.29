@@ -44,6 +44,11 @@ obj-$(CONFIG_MACH_TROUT) += htc_akm_cal.o htc_wifi_nvs.o htc_acoustic.o
 obj-$(CONFIG_MACH_TROUT) += board-trout-mmc.o board-trout-wifi.o
 obj-$(CONFIG_MACH_TROUT) += devices_htc.o
 
+#MSM7200A boards
+obj-$(CONFIG_MACH_HERO) += board-hero.o board-hero-panel.o board-hero-keypad.o
+obj-$(CONFIG_MACH_HERO) += board-hero-rfkill.o
+obj-$(CONFIG_MACH_HERO) += board-hero-mmc.o board-hero-wifi.o htc_wifi_nvs.o htc_awb_cal.o
+
 # MSM7600 boards
 obj-$(CONFIG_MACH_DESIREC) += board-desirec.o board-desirec-panel.o board-desirec-keypad.o
 obj-$(CONFIG_MACH_DESIREC) += board-desirec-rfkill.o
