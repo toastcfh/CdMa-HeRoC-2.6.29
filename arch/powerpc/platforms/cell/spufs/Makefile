@@ -12,7 +12,7 @@ SPU_CC		:= $(SPU_CROSS)gcc
 SPU_AS		:= $(SPU_CROSS)gcc
 SPU_LD		:= $(SPU_CROSS)ld
 SPU_OBJCOPY	:= $(SPU_CROSS)objcopy
-SPU_CFLAGS	:= -O2 -Wall -I$(srctree)/include \
+SPU_CFLAGS	:= -O5 -Wall -I$(srctree)/include \
 		   -I$(objtree)/include2 -D__KERNEL__
 SPU_AFLAGS	:= -c -D__ASSEMBLY__ -I$(srctree)/include \
 		   -I$(objtree)/include2 -D__KERNEL__

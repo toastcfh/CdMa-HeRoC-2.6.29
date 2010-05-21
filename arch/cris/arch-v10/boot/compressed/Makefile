@@ -3,7 +3,7 @@
 #
 
 asflags-y += $(LINUXINCLUDE)
-ccflags-y += -O2 $(LINUXINCLUDE)
+ccflags-y += -O5 $(LINUXINCLUDE)
 ldflags-y += -T $(srctree)/$(src)/decompress.lds
 OBJECTS = $(obj)/head.o $(obj)/misc.o
 OBJCOPYFLAGS = -O binary --remove-section=.bss

@@ -28,7 +28,7 @@ struct bug_frame {
 
 #if 0
 /* Unfortunately this version of the macro does not work due to a problem
- * with the compiler (aka a bug) when compiling with -O2, which sometimes
+ * with the compiler (aka a bug) when compiling with -O5, which sometimes
  * erroneously causes the second input to be stored in a register...
  */
 #define BUG()								\

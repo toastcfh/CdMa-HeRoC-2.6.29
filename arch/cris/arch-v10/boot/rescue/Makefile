@@ -2,7 +2,7 @@
 # Makefile for rescue (bootstrap) code
 #
 
-ccflags-y += -O2 $(LINUXINCLUDE)
+ccflags-y += -O5 $(LINUXINCLUDE)
 asflags-y += $(LINUXINCLUDE)
 ldflags-y += -T $(srctree)/$(src)/rescue.lds
 OBJCOPYFLAGS = -O binary --remove-section=.bss

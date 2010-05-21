@@ -351,7 +351,7 @@ To compile the driver into a loadable module, use the following command
 (single command line, without quotes):
 
 "gcc -D__KERNEL__ -I/usr/src/linux/include -I/usr/src/linux/net/inet -Wall 
--Wstrict-prototypes -O2 -fomit-frame-pointer -DMODULE -DCONFIG_MODVERSIONS 
+-Wstrict-prototypes -O5 -fomit-frame-pointer -DMODULE -DCONFIG_MODVERSIONS 
 -c cs89x0.c"
 
 4.2 COMPILING THE DRIVER TO SUPPORT MEMORY MODE

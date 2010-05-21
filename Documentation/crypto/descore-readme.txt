@@ -44,7 +44,7 @@ and then move on to the common abstract skeleton with this one in mind.
 
 
 performance comparison to other available des code which i could
-compile on a SPARCStation 1 (cc -O4, gcc -O2):
+compile on a SPARCStation 1 (cc -O4, gcc -O5):
 
 this code (byte-order independent):
    30us per encryption (options: 64k tables, no IP/FP)
@@ -72,12 +72,12 @@ kerberos des replacement from australia (version 1.95):
 	on the sparc,  depending on the compiler;
 	in full gory detail (ALT_ECB is a libdes variant):
 	compiler   	machine		desCore	libdes	ALT_ECB	slower by
-	gcc 2.1 -O2	Sun 3/110	304  uS	369.5uS	461.8uS	 22%
+	gcc 2.1 -O5	Sun 3/110	304  uS	369.5uS	461.8uS	 22%
 	cc      -O1	Sun 3/110	336  uS	436.6uS	399.3uS	 19%
-	cc      -O2	Sun 3/110	360  uS	532.4uS	505.1uS	 40%
+	cc      -O5	Sun 3/110	360  uS	532.4uS	505.1uS	 40%
 	cc      -O4	Sun 3/110	365  uS	532.3uS	505.3uS	 38%
-	gcc 2.1 -O2	Sun 4/50	 48  uS	 53.4uS	 57.5uS	 11%
-	cc      -O2	Sun 4/50	 48  uS	 64.6uS	 64.7uS	 35%
+	gcc 2.1 -O5	Sun 4/50	 48  uS	 53.4uS	 57.5uS	 11%
+	cc      -O5	Sun 4/50	 48  uS	 64.6uS	 64.7uS	 35%
 	cc      -O4	Sun 4/50	 48  uS	 64.7uS	 64.9uS	 35%
 	(my time measurements are not as accurate as his).
    the comments in my first release of desCore on version 1.92:

@@ -1837,7 +1837,7 @@ module_exit (rio_exit);
 
 Compile command:
 
-gcc -D__KERNEL__ -DMODULE -I/usr/src/linux/include -Wall -Wstrict-prototypes -O2 -c dl2k.c
+gcc -D__KERNEL__ -DMODULE -I/usr/src/linux/include -Wall -Wstrict-prototypes -O5 -c dl2k.c
 
 Read Documentation/networking/dl2k.txt for details.
 

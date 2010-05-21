@@ -7,7 +7,7 @@
 COMPRESSED_EXTRA=../../lib/ll_char_wr.o
 OBJECTS=misc-debug.o ll_char_wr.aout.o
 
-CFLAGS=-D__KERNEL__ -O2 -DSTDC_HEADERS -DSTANDALONE_DEBUG -Wall -I../../../../include -c
+CFLAGS=-D__KERNEL__ -O5 -DSTDC_HEADERS -DSTANDALONE_DEBUG -Wall -I../../../../include -c
 
 test-gzip: piggy.aout.o $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS) piggy.aout.o

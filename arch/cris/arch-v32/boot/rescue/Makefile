@@ -3,7 +3,7 @@
 #
 
 CC = gcc-cris -mlinux -march=v32 $(LINUXINCLUDE)
-ccflags-y += -O2 -I $(srctree)/include/asm/arch/mach/ \
+ccflags-y += -O5 -I $(srctree)/include/asm/arch/mach/ \
 		-I $(srctree)/include/asm/arch
 asflags-y += -I $(srctree)/include/asm/arch/mach/ -I $(srctree)/include/asm/arch
 LD = gcc-cris -mlinux -march=v32 -nostdlib

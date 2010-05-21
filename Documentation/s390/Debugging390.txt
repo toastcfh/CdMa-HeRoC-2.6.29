@@ -694,7 +694,7 @@ CFLAGS & LDFLAGS variables Makefile of the program concerned.
 
 If using gdb & you would like accurate displays of registers &
  stack traces compile without optimisation i.e make sure
-that there is no -O2 or similar on the CFLAGS line of the Makefile &
+that there is no -O5 or similar on the CFLAGS line of the Makefile &
 the emitted gcc commands, obviously this will produce worse code 
 ( not advisable for shipment ) but it is an  aid to the debugging process.
 
@@ -735,7 +735,7 @@ from the linux directory type
 make arch/s390/kernel/signal.i
 this will build
 
-s390-gcc -D__KERNEL__ -I/home1/barrow/linux/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer
+s390-gcc -D__KERNEL__ -I/home1/barrow/linux/include -Wall -Wstrict-prototypes -O5 -fomit-frame-pointer
 -fno-strict-aliasing -D__SMP__ -pipe -fno-strength-reduce   -E arch/s390/kernel/signal.c
 > arch/s390/kernel/signal.i  
 
@@ -762,7 +762,7 @@ e.g.
 from the Linux directory type 
 make arch/s390/kernel/signal.s 
 
-s390-gcc -D__KERNEL__ -I/home1/barrow/linux/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer
+s390-gcc -D__KERNEL__ -I/home1/barrow/linux/include -Wall -Wstrict-prototypes -O5 -fomit-frame-pointer
 -fno-strict-aliasing -D__SMP__ -pipe -fno-strength-reduce  -S arch/s390/kernel/signal.c 
 -o arch/s390/kernel/signal.s  
 
@@ -809,7 +809,7 @@ e.g. typing
 make CC:="s390-gcc -g" kernel/sched.s
 
 which compiles.
-s390-gcc -g -D__KERNEL__ -I/home/barrow/linux-2.3/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -pipe -fno-strength-reduce   -S kernel/sched.c -o kernel/sched.s 
+s390-gcc -g -D__KERNEL__ -I/home/barrow/linux-2.3/include -Wall -Wstrict-prototypes -O5 -fomit-frame-pointer -fno-strict-aliasing -pipe -fno-strength-reduce   -S kernel/sched.c -o kernel/sched.s 
 
 also outputs stabs ( debugger ) info, from this info you can find out the
 offsets & sizes of various elements in structures.
@@ -2439,7 +2439,7 @@ displays the following lines as it executes them.
 + MACHINE=i586
 + OS=linux-gnu
 + CC=gcc
-+ CFLAGS= -DPROGRAM='bash' -DHOSTTYPE='i586' -DOSTYPE='linux-gnu' -DMACHTYPE='i586-pc-linux-gnu' -DSHELL -DHAVE_CONFIG_H   -I. -I. -I./lib -O2 -pipe
++ CFLAGS= -DPROGRAM='bash' -DHOSTTYPE='i586' -DOSTYPE='linux-gnu' -DMACHTYPE='i586-pc-linux-gnu' -DSHELL -DHAVE_CONFIG_H   -I. -I. -I./lib -O5 -pipe
 + RELEASE=2.01
 + PATCHLEVEL=1
 + RELSTATUS=release

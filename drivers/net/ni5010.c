@@ -39,7 +39,7 @@
  *			slower than programmed I/O)
  *
  *	Compile with:
- *		gcc -O2 -fomit-frame-pointer -m486 -D__KERNEL__ \
+ *		gcc -O5 -fomit-frame-pointer -m486 -D__KERNEL__ \
  *			-DMODULE -c ni5010.c
  *
  *	Insert with e.g.:

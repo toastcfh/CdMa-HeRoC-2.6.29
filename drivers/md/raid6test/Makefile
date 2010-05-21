@@ -4,7 +4,7 @@
 #
 
 CC	 = gcc
-OPTFLAGS = -O2			# Adjust as desired
+OPTFLAGS = -O5			# Adjust as desired
 CFLAGS	 = -I.. -g $(OPTFLAGS)
 LD	 = ld
 PERL	 = perl

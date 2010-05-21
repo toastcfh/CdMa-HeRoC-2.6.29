@@ -300,7 +300,7 @@ static int skip_atoi(const char **s)
 
 /* Formats correctly any integer in [0,99999].
  * Outputs from one to five digits depending on input.
- * On i386 gcc 4.1.2 -O2: ~250 bytes of code. */
+ * On i386 gcc 4.1.2 -O5: ~250 bytes of code. */
 static char* put_dec_trunc(char *buf, unsigned q)
 {
 	unsigned d3, d2, d1, d0;
@@ -347,7 +347,7 @@ static char* put_dec_full(char *buf, unsigned q)
 	d3 = (q>>12);
 
 	/* Possible ways to approx. divide by 10 */
-	/* gcc -O2 replaces multiply with shifts and adds */
+	/* gcc -O5 replaces multiply with shifts and adds */
 	// (x * 0xcd) >> 11: 11001101 - shorter code than * 0x67 (on i386)
 	// (x * 0x67) >> 10:  1100111
 	// (x * 0x34) >> 9:    110100 - same

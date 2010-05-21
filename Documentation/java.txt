@@ -51,7 +51,7 @@ other program after you have done the following:
    above given configuration string.
 
    You, too, need the little program after the script. Compile like
-   gcc -O2 -o javaclassname javaclassname.c
+   gcc -O5 -o javaclassname javaclassname.c
    and stick it to /usr/local/bin.
 
    Both the javawrapper shellscript and the javaclassname program
