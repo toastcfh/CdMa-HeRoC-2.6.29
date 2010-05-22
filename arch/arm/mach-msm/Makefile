@@ -44,6 +44,12 @@ obj-$(CONFIG_MACH_TROUT) += htc_akm_cal.o htc_wifi_nvs.o htc_acoustic.o
 obj-$(CONFIG_MACH_TROUT) += board-trout-mmc.o board-trout-wifi.o
 obj-$(CONFIG_MACH_TROUT) += devices_htc.o
 
+obj-$(CONFIG_MACH_SAPPHIRE) += board-sapphire.o board-sapphire-panel.o board-sapphire-keypad.o board-sapphire-gpio.o
+obj-$(CONFIG_MACH_SAPPHIRE) += board-sapphire-rfkill.o
+obj-$(CONFIG_MACH_SAPPHIRE) += board-sapphire-mmc.o board-sapphire-wifi.o
+# obj-$(CONFIG_MACH_SAPPHIRE) +=  msm_vibrator.o
+# obj-$(CONFIG_MACH_SAPPHIRE) += devices_htc.o
+
 #MSM7200A boards
 obj-$(CONFIG_MACH_HERO) += board-hero.o board-hero-panel.o board-hero-keypad.o
 obj-$(CONFIG_MACH_HERO) += board-hero-rfkill.o
