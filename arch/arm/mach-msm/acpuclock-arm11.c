@@ -210,6 +210,7 @@ static struct freq_tbl_map acpu_freq_tbl_list[] = {
 	TABLE_CONFIG(HERO, 72xx),
 	TABLE_CONFIG(HEROC, 72xx),
 	TABLE_CONFIG(DESIREC, 72xx),
+        TABLE_CONFIG(SAPPHIRE, 72xx),
 	{ 0, 0, 0}
 };
 
