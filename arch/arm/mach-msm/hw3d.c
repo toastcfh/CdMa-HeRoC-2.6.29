@@ -74,6 +74,7 @@ struct hw3d_info {
 	struct timer_list	revoke_timer;
 	wait_queue_head_t	revoke_wq;
 	wait_queue_head_t	revoke_done_wq;
+	unsigned int		waiter_cnt;
 
 	spinlock_t		lock;
 
@@ -266,7 +267,7 @@ static void do_force_revoke(struct hw3d_info *info)
 	spin_unlock_irqrestore(&info->lock, flags);
 }
 
-#define REVOKE_TIMEOUT		(HZ / 2)
+#define REVOKE_TIMEOUT		(2 * HZ)
 static void locked_hw3d_revoke(struct hw3d_info *info)
 {
 	/* force us to wait to suspend until the revoke is done. If the
@@ -370,6 +371,64 @@ static int hw3d_flush(struct file *filp, fl_owner_t id)
 	return 0;
 }
 
+static int should_wakeup(struct hw3d_info *info, unsigned int cnt)
+{
+	unsigned long flags;
+	int ret;
+
+	spin_lock_irqsave(&info->lock, flags);
+	ret = (cnt != info->waiter_cnt) ||
+		(!info->suspending && !info->client_file);
+	spin_unlock_irqrestore(&info->lock, flags);
+
+	return ret;
+}
+
+static int locked_open_wait_for_gpu(struct hw3d_info *info,
+				    unsigned long *flags)
+{
+	unsigned int my_cnt;
+	int ret;
+
+	my_cnt = ++info->waiter_cnt;
+	pr_debug("%s: wait_for_open %d\n", __func__, my_cnt);
+
+	/* in case there are other waiters, wake and release them. */
+	wake_up(&info->revoke_done_wq);
+
+	if (info->suspending)
+		pr_info("%s: suspended, waiting (%d %d)\n", __func__,
+			current->group_leader->pid, current->pid);
+	if (info->client_file)
+		pr_info("%s: has client, waiting (%d %d)\n", __func__,
+			current->group_leader->pid, current->pid);
+	spin_unlock_irqrestore(&info->lock, *flags);
+
+	ret = wait_event_interruptible(info->revoke_done_wq,
+				       should_wakeup(info, my_cnt));
+
+	spin_lock_irqsave(&info->lock, *flags);
+	pr_debug("%s: woke up (%d %d %p)\n", __func__,
+		 info->waiter_cnt, info->suspending, info->client_file);
+
+	if (ret >= 0) {
+		if (my_cnt != info->waiter_cnt) {
+			pr_info("%s: someone else asked for gpu after us %d:%d"
+				"(%d %d)\n", __func__,
+				current->group_leader->pid, current->pid,
+				my_cnt, info->waiter_cnt);
+			ret = -EBUSY;
+		} else if (info->suspending || info->client_file) {
+			pr_err("%s: couldn't get the gpu for %d:%d (%d %p)\n",
+			       __func__, current->group_leader->pid,
+			       current->pid, info->suspending,
+			       info->client_file);
+			ret = -EBUSY;
+		} else
+			ret = 0;
+	}
+	return ret;
+}
 
 static int hw3d_open(struct inode *inode, struct file *file)
 {
@@ -400,31 +459,18 @@ static int hw3d_open(struct inode *inode, struct file *file)
 		return 0;
 
 	spin_lock_irqsave(&info->lock, flags);
-	if (info->suspending) {
-		pr_warning("%s: can't open hw3d while suspending\n", __func__);
-		ret = -EPERM;
-		spin_unlock_irqrestore(&info->lock, flags);
-		goto err;
-	}
-
 	if (info->client_file) {
 		pr_debug("hw3d: have client_file, need revoke\n");
 		locked_hw3d_revoke(info);
-		spin_unlock_irqrestore(&info->lock, flags);
-		ret = wait_event_interruptible(info->revoke_done_wq,
-					       !info->client_file);
-		if (ret < 0)
-			goto err;
-		spin_lock_irqsave(&info->lock, flags);
-		if (info->client_file) {
-			/* between is waking up and grabbing the lock,
-			 * someone else tried to open the gpu, and got here
-			 * first, let them have it. */
-			spin_unlock_irqrestore(&info->lock, flags);
-			ret = -EBUSY;
-			goto err;
-		}
 	}
+
+	ret = locked_open_wait_for_gpu(info, &flags);
+	if (ret < 0) {
+		spin_unlock_irqrestore(&info->lock, flags);
+		goto err;
+	}
+	pr_info("%s: pid %d tid %d got gpu\n", __func__,
+		current->group_leader->pid, current->pid);
 
 	info->client_file = file;
 	get_task_struct(current->group_leader);
@@ -532,6 +578,11 @@ static int hw3d_mmap(struct file *file, struct vm_area_struct *vma)
 		pr_err("%s: Trying to mmap unknown region %d\n", __func__,
 		       region);
 		return -EINVAL;
+	} else if (vma_size > info->regions[region].size) {
+		pr_err("%s: VMA size %ld exceeds region %d size %ld\n",
+			__func__, vma_size, region,
+			info->regions[region].size);
+		return -EINVAL;
 	} else if (REGION_PAGE_OFFS(vma->vm_pgoff) != 0 ||
 		   (vma_size & ~PAGE_MASK)) {
 		pr_err("%s: Can't remap part of the region %d\n", __func__,
@@ -572,6 +623,13 @@ static int hw3d_mmap(struct file *file, struct vm_area_struct *vma)
 		ret = -EAGAIN;
 		goto done;
 	}
+
+	/* Prevent a malicious client from stealing another client's data
+	 * by forcing a revoke on it and then mmapping the GPU buffers.
+	 */
+	if (region != HW3D_REGS)
+		memset(info->regions[region].vbase, 0,
+		       info->regions[region].size);
 
 	vma->vm_ops = &hw3d_vm_ops;
 
@@ -641,25 +699,9 @@ static void hw3d_late_resume(struct early_suspend *h)
 	if (info->suspending)
 		pr_info("%s: resuming\n", __func__);
 	info->suspending = 0;
+	wake_up(&info->revoke_done_wq);
 	spin_unlock_irqrestore(&info->lock, flags);
 }
-
-#ifndef CONFIG_MSM_HW3D_EARLYSUSPEND_ENABLED
-static void hw3d_suspend(struct platform_device *pdev)
-{
-	struct hw3d_info *info = platform_get_drvdata(pdev);
-	unsigned long flags;
-
-	spin_lock_irqsave(&info->lock, flags);
-	info->suspending = 1;
-	if (info->client_file) {
-		pr_info("%s: suspending\n", __func__);
-		locked_hw3d_revoke(info);
-	}
-	spin_unlock_irqrestore(&info->lock, flags);
-	return 0;
-}
-#endif
 
 static int hw3d_resume(struct platform_device *pdev)
 {
@@ -759,12 +801,10 @@ static int __init hw3d_probe(struct platform_device *pdev)
 		goto err_misc_reg_client;
 	}
 
-#ifdef CONFIG_MSM_HW3D_EARLYSUSPEND_ENABLED
 	info->early_suspend.suspend = hw3d_early_suspend;
 	info->early_suspend.resume = hw3d_late_resume;
 	info->early_suspend.level = EARLY_SUSPEND_LEVEL_DISABLE_FB;
 	register_early_suspend(&info->early_suspend);
-#endif
 
 	info->irq_en = 1;
 	ret = request_irq(info->irq, hw3d_irq_handler, IRQF_TRIGGER_HIGH,
@@ -804,9 +844,6 @@ err_alloc:
 static struct platform_driver msm_hw3d_driver = {
 	.probe		= hw3d_probe,
 	.resume		= hw3d_resume,
-#ifndef CONFIG_MSM_HW3D_EARLYSUSPEND_ENABLED
-	.suspend         = hw3d_suspend,
-#endif
 	.driver		= {
 		.name = "msm_hw3d",
 		.owner = THIS_MODULE,
