@@ -46,7 +46,7 @@ struct msm_ptbl_entry
 	__u32 flags;
 };
 
-#define MSM_MAX_PARTITIONS 8
+#define MSM_MAX_PARTITIONS 10
 
 static struct mtd_partition msm_nand_partitions[MSM_MAX_PARTITIONS];
 static char msm_nand_names[MSM_MAX_PARTITIONS * 16];
@@ -118,6 +118,21 @@ static int __init parse_tag_msm_partition(const struct tag *tag)
 		count++;
 	}
 #endif /* CONFIG_VIRTUAL_KPANIC_SRC */
+
+#if CONFIG_SPLASH_PARTITION
+	// splash partition
+	*((int*)(name)) = 0x616c7073;
+	*((int*)(name+4)) = 0x00006873;
+	ptn->name = name;
+	ptn->offset = 0x02540000;
+	ptn->size = 0x0060000; // actual size is 320*480*2 = 0x4b000
+
+	count++;
+#endif
+	
+	
+
+
 out:
 	msm_nand_data.nr_parts = count;
 	msm_nand_data.parts = msm_nand_partitions;
