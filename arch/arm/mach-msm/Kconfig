@@ -803,6 +803,14 @@ config MMC_BUSCLK_PWRSAVE
 	help
 	  Clocks are disabled after 1 second of inactivity.
 
+config SPLASH_PARTITION
+	bool "Create virtual splash partition"
+	default n
+	help
+	   Create a virtual mtd partition named "splash", for easy to use
+	   recovrey to flash the first splash image when boot the phone.
+	*******DO NOT USE IF YOU ARE USING PRODUCT BUILD*************
+
 config VIRTUAL_KPANIC_PARTITION
 	bool "Create virtual kpanic partition"
 	default n
